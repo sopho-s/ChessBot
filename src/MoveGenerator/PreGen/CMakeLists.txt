@@ -1,0 +1,1 @@
+add_library(PreMoveGen PreMoveGen.cpp PreMoveGen.h)
