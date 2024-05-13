@@ -1,2 +1,3 @@
 add_subdirectory(Objects)
+add_subdirectory(MoveGenerator)
 add_subdirectory(PreGen)

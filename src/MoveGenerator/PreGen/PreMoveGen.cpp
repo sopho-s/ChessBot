@@ -1,4 +1,5 @@
 #include "PreMoveGen.h"
+#define MAGICSHIFT 42
 namespace {
     std::string strings[64];
 }
@@ -63,9 +64,47 @@ namespace MoveGenerator {
             }
             File.close();
         }
+        void BishopMoveGen() {
+            unsigned long long* out;
+            out = new unsigned long long[64];
+            out = MoveGenerator::BishopMoveGen();
+            std::ofstream File("bishopmoves.csv");
+            std::stringstream str;
+            for (int i = 0; i < 64; i++) {
+                str << out[i];
+                std::string val;
+                str >> val;
+                str.clear();
+                File << val;
+                File << ",";
+            }
+            File.close();
+            delete[] out;
+        }
+        void RookMoveGen() {
+            unsigned long long* out;
+            out = new unsigned long long[64];
+            out = MoveGenerator::RookMoveGen();
+            std::ofstream File("rookmoves.csv");
+            std::stringstream str;
+            for (int i = 0; i < 64; i++) {
+                str << out[i];
+                std::string val;
+                str >> val;
+                str.clear();
+                File << val;
+                File << ",";
+            }
+            File.close();
+            delete[] out;
+        }
         void Init() {
             KingMoveGen();
             KnightMoveGen();
+            RookMoveGen();
+            BishopMoveGen();
+            MoveGenerator::InitRookTable();
+            MoveGenerator::InitBishopTable();
         }
         inline void split(std::string str) {
             int currindex = 0, i = 0;
