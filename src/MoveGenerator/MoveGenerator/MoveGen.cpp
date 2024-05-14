@@ -258,7 +258,7 @@ namespace MoveGenerator {
                     bar += "-";
                 }
             }
-            std::cout << bar << " " << std::setprecision(2) << percent << "%\r";
+            std::cout << bar << " " << std::setprecision(2) << (percent * 100) << "%\r";
         }
         std::cout << "Rook move generation: ==================== 100.00%" << std::endl;
     }
@@ -299,7 +299,7 @@ namespace MoveGenerator {
                     bar += "-";
                 }
             }
-            std::cout << bar << " " << std::setprecision(2) << percent << "%\r";
+            std::cout << bar << " " << std::setprecision(2) << (percent * 100) << "%\r";
         }
         std::cout << "Bishop move generation: ==================== 100.00%" << std::endl;
     }
