@@ -4,8 +4,15 @@
 #include <cstring>
 #include <iostream>
 #include <iomanip>
+#include <stdio.h>
+#include <intrin.h>
 #include <vector>
-#include "Board.h"
+#include <map>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include "PositionInfo.h"
+#include "Display.h"
 namespace MoveGenerator {
     const size_t NDIRS = 8;
     enum Direction : int {
@@ -25,7 +32,10 @@ namespace MoveGenerator {
         NO_SQUARE
     };
     enum Side : int {
-        black, white
+        black, white, nocolour
+    };
+    enum Piece : int {
+        pawn, knight, bishop, rook, queen, king, nopiece
     };
     inline Square& operator++(Square& s) { return s = Square(int(s) + 1); }
     constexpr Square operator+(Square s, Direction d) { return Square(int(s) + int(d)); }
@@ -37,9 +47,14 @@ namespace MoveGenerator {
     unsigned long long* BishopMoveGen();
     void InitRookTable();
     void InitBishopTable();
-    unsigned long long RookMoveGen(Square pos, unsigned long long blockers);
-    unsigned long long BishopMoveGen(Square pos, unsigned long long blockers);
-    unsigned long long QueenMoveGen(Square pos, unsigned long long blockers);
-    std::vector<Objects::Board> GetMovesFromPostion(Objects::Board);
+    void InitKnightTable();
+    void InitKingTable();
+    unsigned long long PawnAttackGen(int pos, int sidetomove);
+    unsigned long long KingMoveGen(int pos);
+    unsigned long long KnightMoveGen(int pos);
+    unsigned long long RookMoveGen(int pos, unsigned long long blockers);
+    unsigned long long BishopMoveGen(int pos, unsigned long long blockers);
+    unsigned long long QueenMoveGen(int pos, unsigned long long blockers);
+    std::vector<Objects::PositionInfo> GetMovesFromPostion(Objects::PositionInfo currposition, int sidetomove);
 }
 #endif

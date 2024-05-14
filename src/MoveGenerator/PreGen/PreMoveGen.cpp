@@ -1,5 +1,4 @@
 #include "PreMoveGen.h"
-#define MAGICSHIFT 42
 namespace {
     std::string strings[64];
 }
@@ -105,6 +104,8 @@ namespace MoveGenerator {
             BishopMoveGen();
             MoveGenerator::InitRookTable();
             MoveGenerator::InitBishopTable();
+            MoveGenerator::InitKingTable();
+            MoveGenerator::InitKnightTable();
         }
         inline void split(std::string str) {
             int currindex = 0, i = 0;
@@ -132,6 +133,7 @@ namespace MoveGenerator {
             }
             return knightmap;
         }
+
         std::map<int, unsigned long long> GetKingMoves() {
             std::ifstream File("kingmoves.csv");
             std::string kingmovestxt;

@@ -17,34 +17,48 @@ namespace Display {
 
         return os;
     }
+    void print_intboard(int intboard[64])
+    {
+        printf("\n");
+        
+        for (int rank = 7; rank >= 0; rank--)
+        {
+            for (int file = 0; file < 8; file++)
+            {
+                int square = rank * 8 + file;
+                
+                if (!file)
+                    printf("  %d ", 8 - rank);
+                
+                printf(" %d", intboard[square]);
+            }
+            
+            printf("\n");
+        }
+        
+        printf("\n     a b c d e f g h\n\n");
+    }
     void print_bitboard(unsigned long long bitboard)
     {
         printf("\n");
         
-        // loop over board ranks
         for (int rank = 7; rank >= 0; rank--)
         {
-            // loop over board files
             for (int file = 0; file < 8; file++)
             {
-                // init board square
                 int square = rank * 8 + file;
                 
-                // print ranks
                 if (!file)
                     printf("  %d ", 8 - rank);
                 
-                // print bit indexed by board square
                 printf(" %d", get_bit(bitboard, square) ? 1 : 0);
             }
             
             printf("\n");
         }
         
-        // print files
         printf("\n     a b c d e f g h\n\n");
         
-        // print bitboard as decimal
         printf("     bitboard: %llu\n\n", bitboard);
     }
 }

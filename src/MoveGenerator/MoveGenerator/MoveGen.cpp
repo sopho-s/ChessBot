@@ -1,18 +1,12 @@
 #include "MoveGen.h"
+namespace {
+    std::string strings[64];
+}
 namespace MoveGenerator {
     unsigned long long rookmoves[64];
     unsigned long long bishopmoves[64];
-    const unsigned int magicmoves_r_shift[64]=
-    {
-        52, 53, 53, 53, 53, 53, 53, 52,
-        53, 54, 54, 54, 54, 54, 54, 53,
-        53, 54, 54, 54, 54, 54, 54, 53,
-        53, 54, 54, 54, 54, 54, 54, 53,
-        53, 54, 54, 54, 54, 54, 54, 53,
-        53, 54, 54, 54, 54, 54, 54, 53,
-        53, 54, 54, 54, 54, 54, 54, 53,
-        53, 54, 54, 53, 53, 53, 53, 53
-    };
+    std::map<int, unsigned long long> kingmoves;
+    std::map<int, unsigned long long> knightmoves;
 
     const unsigned long long ROOK_MAGICS[64] = {
         0x8a80104000800020ULL,
@@ -80,48 +74,6 @@ namespace MoveGenerator {
         0x2006104900a0804ULL,
         0x1004081002402ULL,
     };
-    int rook_rellevant_bits[64] = {
-        12, 11, 11, 11, 11, 11, 11, 12,
-        11, 10, 10, 10, 10, 10, 10, 11,
-        11, 10, 10, 10, 10, 10, 10, 11,
-        11, 10, 10, 10, 10, 10, 10, 11,
-        11, 10, 10, 10, 10, 10, 10, 11,
-        11, 10, 10, 10, 10, 10, 10, 11,
-        11, 10, 10, 10, 10, 10, 10, 11,
-        12, 11, 11, 11, 11, 11, 11, 12
-    };
-    const unsigned long long magicmoves_r_mask[64]=
-    {	
-        0x000101010101017E, 0x000202020202027C, 0x000404040404047A, 0x0008080808080876,
-        0x001010101010106E, 0x002020202020205E, 0x004040404040403E, 0x008080808080807E,
-        0x0001010101017E00, 0x0002020202027C00, 0x0004040404047A00, 0x0008080808087600,
-        0x0010101010106E00, 0x0020202020205E00, 0x0040404040403E00, 0x0080808080807E00,
-        0x00010101017E0100, 0x00020202027C0200, 0x00040404047A0400, 0x0008080808760800,
-        0x00101010106E1000, 0x00202020205E2000, 0x00404040403E4000, 0x00808080807E8000,
-        0x000101017E010100, 0x000202027C020200, 0x000404047A040400, 0x0008080876080800,
-        0x001010106E101000, 0x002020205E202000, 0x004040403E404000, 0x008080807E808000,
-        0x0001017E01010100, 0x0002027C02020200, 0x0004047A04040400, 0x0008087608080800,
-        0x0010106E10101000, 0x0020205E20202000, 0x0040403E40404000, 0x0080807E80808000,
-        0x00017E0101010100, 0x00027C0202020200, 0x00047A0404040400, 0x0008760808080800,
-        0x00106E1010101000, 0x00205E2020202000, 0x00403E4040404000, 0x00807E8080808000,
-        0x007E010101010100, 0x007C020202020200, 0x007A040404040400, 0x0076080808080800,
-        0x006E101010101000, 0x005E202020202000, 0x003E404040404000, 0x007E808080808000,
-        0x7E01010101010100, 0x7C02020202020200, 0x7A04040404040400, 0x7608080808080800,
-        0x6E10101010101000, 0x5E20202020202000, 0x3E40404040404000, 0x7E80808080808000
-    };
-
-    //my original tables for bishops
-    const unsigned int magicmoves_b_shift[64]=
-    {
-        58, 59, 59, 59, 59, 59, 59, 58,
-        59, 59, 59, 59, 59, 59, 59, 59,
-        59, 59, 57, 57, 57, 57, 59, 59,
-        59, 59, 57, 55, 55, 57, 59, 59,
-        59, 59, 57, 55, 55, 57, 59, 59,
-        59, 59, 57, 57, 57, 57, 59, 59,
-        59, 59, 59, 59, 59, 59, 59, 59,
-        58, 59, 59, 59, 59, 59, 59, 58
-    };
 
     const unsigned long long BISHOP_MAGICS[64]=
     {
@@ -143,26 +95,6 @@ namespace MoveGenerator {
         0x0000000010020200, 0x0000000404080200, 0x0000040404040400, 0x0002020202020200
     };
 
-
-    const unsigned long long magicmoves_b_mask[64]=
-    {
-        0x0040201008040200, 0x0000402010080400, 0x0000004020100A00, 0x0000000040221400,
-        0x0000000002442800, 0x0000000204085000, 0x0000020408102000, 0x0002040810204000,
-        0x0020100804020000, 0x0040201008040000, 0x00004020100A0000, 0x0000004022140000,
-        0x0000000244280000, 0x0000020408500000, 0x0002040810200000, 0x0004081020400000,
-        0x0010080402000200, 0x0020100804000400, 0x004020100A000A00, 0x0000402214001400,
-        0x0000024428002800, 0x0002040850005000, 0x0004081020002000, 0x0008102040004000,
-        0x0008040200020400, 0x0010080400040800, 0x0020100A000A1000, 0x0040221400142200,
-        0x0002442800284400, 0x0004085000500800, 0x0008102000201000, 0x0010204000402000,
-        0x0004020002040800, 0x0008040004081000, 0x00100A000A102000, 0x0022140014224000,
-        0x0044280028440200, 0x0008500050080400, 0x0010200020100800, 0x0020400040201000,
-        0x0002000204081000, 0x0004000408102000, 0x000A000A10204000, 0x0014001422400000,
-        0x0028002844020000, 0x0050005008040200, 0x0020002010080400, 0x0040004020100800,
-        0x0000020408102000, 0x0000040810204000, 0x00000A1020400000, 0x0000142240000000,
-        0x0000284402000000, 0x0000500804020000, 0x0000201008040200, 0x0000402010080400,
-        0x0002040810204000, 0x0004081020400000, 0x000A102040000000, 0x0014224000000000,
-        0x0028440200000000, 0x0050080402000000, 0x0020100804020000, 0x0040201008040200
-    };
     const unsigned long long SQUARE_BB[65] = {
         0x1, 0x2, 0x4, 0x8,
         0x10, 0x20, 0x40, 0x80,
@@ -216,7 +148,8 @@ namespace MoveGenerator {
     const unsigned long long k4 = 0x0f0f0f0f0f0f0f0f;
     const unsigned long long kf = 0x0101010101010101;
 
-    //Returns number of set bits in the bitboard
+    // Returns number of set bits in bit board
+    // TODO: There is probably a intrensic faster function for this but is not to necessary
     inline int pop_count(unsigned long long x) {
         x = x - ((x >> 1) & k1);
         x = (x & k2) + ((x >> 2) & k2);
@@ -225,6 +158,8 @@ namespace MoveGenerator {
         return int(x);
     }
 
+    // Generates all unblocked rook moves
+    // !Maybe should be depricated soon?
     unsigned long long* RookMoveGen() {
         unsigned long long* out = new unsigned long long[64]();
         for (int i = 0; i < 8; i++) {
@@ -246,6 +181,9 @@ namespace MoveGenerator {
         std::memcpy(rookmoves, out, 64 * sizeof(unsigned long long));
         return out;
     }
+    
+    // Generates all unblocked bishop moves
+    // !Maybe should be depricated soon?
     unsigned long long* BishopMoveGen() {
         unsigned long long* out = new unsigned long long[64]();
         for (int i = 0; i < 8; i++) {
@@ -268,6 +206,8 @@ namespace MoveGenerator {
         std::memcpy(bishopmoves, out, 64 * sizeof(unsigned long long));
         return out;
     }
+
+    // Some of this was ripped of the web from public repos because I couldn't get the table working for the magic bitboards
     unsigned long long reverse(unsigned long long b) {
         b = (b & 0x5555555555555555) << 1 | (b >> 1) & 0x5555555555555555;
         b = (b & 0x3333333333333333) << 2 | (b >> 2) & 0x3333333333333333;
@@ -285,6 +225,7 @@ namespace MoveGenerator {
         return sliding_attacks(square, occ, MASK_FILE[div(square, 8).rem]) |
             sliding_attacks(square, occ, MASK_RANK[div(square, 8).quot]);
     }
+    // Creates the rook attack table
     void InitRookTable() {
         std::cout << "Bishop move generation: -------------------- 0.00%\r";
         unsigned long long edges, subset, index;
@@ -325,6 +266,7 @@ namespace MoveGenerator {
         return sliding_attacks(square, occ, MASK_DIAGONAL[7 + div(square, 8).quot - div(square, 8).rem]) |
             sliding_attacks(square, occ, MASK_ANTI_DIAGONAL[div(square, 8).quot + div(square, 8).rem]);
     }
+    // Creates the bishop attack table
     void InitBishopTable() {
         std::cout << "Bishop move generation: -------------------- 0.00%\r";
         unsigned long long edges, subset, index;
@@ -360,27 +302,181 @@ namespace MoveGenerator {
             std::cout << bar << " " << std::setprecision(2) << percent << "%\r";
         }
         std::cout << "Bishop move generation: ==================== 100.00%" << std::endl;
-
     }
-    unsigned long long RookMoveGen(Square pos, unsigned long long blockers) {
+    // Splits a string
+    inline void split(std::string str) {
+        int currindex = 0, i = 0;
+        int startindex = 0, endindex = 0;
+        while (str.length() > i) {
+            if (str[i] == ',') {
+                endindex = i;
+                std::string substr = "";
+                substr.append(str, startindex, endindex - startindex);
+                strings[currindex] = substr;
+                currindex++;
+                startindex = endindex + 1;
+            }
+            i++;
+        }
+    }
+    void InitKnightTable() {
+        std::ifstream File("knightmoves.csv");
+        std::string knightmovestxt;
+        getline(File, knightmovestxt);
+        split(knightmovestxt);
+        for (int i = 0; i < 64; i++) {
+            knightmoves[i] = std::stoull(strings[i]);
+        }
+    }
+    void InitKingTable() {
+        std::ifstream File("kingmoves.csv");
+        std::string kingmovestxt;
+        getline(File, kingmovestxt);
+        std::map<int, unsigned long long> kingmap;
+        split(kingmovestxt);
+        for (int i = 0; i < 64; i++) {
+            kingmoves[i] = std::stoull(strings[i]);
+        }
+    }
+    unsigned long long PawnAttackGen(int pos, int sidetomove) {
+        unsigned long long piecepos = 1ull << pos;
+        unsigned long long attacks = 0ull;
+        if (sidetomove == 0) {
+            attacks = piecepos << 9 & 0b111111101111111011111110111111101111111011111110111111101111111;
+            attacks |= piecepos << 7 & 0b1111111011111110111111101111111011111110111111101111111011111110;
+        } else {
+            attacks = piecepos >> 9 & 0b111111101111111011111110111111101111111011111110111111101111111;
+            attacks |= piecepos >> 7 & 0b1111111011111110111111101111111011111110111111101111111011111110;
+        }
+        return attacks;
+    }
+    unsigned long long PawnMoveGen(int pos, int sidetomove, unsigned long long pieces) {
+        unsigned long long piecepos = 1ull << pos;
+        unsigned long long attacks = 0ull;
+        if (sidetomove == 0) {
+            pieces = pieces << 8;
+            attacks = piecepos << 8;
+            if (attacks & pieces > 0ull) {
+                attacks = 0ull;
+                return attacks;
+            }
+            pieces = pieces << 8;
+            attacks |= (piecepos & 65280ull) << 16;
+            if (attacks & pieces > 0ull) {
+                attacks -= attacks & pieces;
+            }
+        } else {
+            pieces = pieces >> 8;
+            attacks = piecepos >> 8;
+            if (attacks & pieces > 0ull) {
+                attacks = 0ull;
+                return attacks;
+            }
+            pieces = pieces >> 8;
+            attacks |= (piecepos & 71776119061217280ull) >> 16;
+            if (attacks & pieces > 0ull) {
+                attacks -= attacks & pieces;
+            }
+        }
+        return attacks;
+    }
+    unsigned long long KingMoveGen(int pos) {
+        return kingmoves[pos];
+    }
+    unsigned long long KnightMoveGen(int pos) {
+        return knightmoves[pos];
+    }
+    unsigned long long RookMoveGen(int pos, unsigned long long blockers) {
         return rookattacks[pos][((blockers & ROOK_ATTACK_MASKS[pos]) * ROOK_MAGICS[pos])
-		    >> (64-rook_rellevant_bits[pos])];
+		    >> (ROOK_ATTACK_SHIFTS[pos])];
     }
-    unsigned long long BishopMoveGen(Square pos, unsigned long long blockers) {
+    unsigned long long BishopMoveGen(int pos, unsigned long long blockers) {
         return bishopattacks[pos][((blockers & BISHOP_ATTACK_MASKS[pos]) * BISHOP_MAGICS[pos])
 		    >> (BISHOP_ATTACK_SHIFTS[pos])];
     }
-    unsigned long long QueenMoveGen(Square pos, unsigned long long blockers) {
+    unsigned long long QueenMoveGen(int pos, unsigned long long blockers) {
         return (rookattacks[pos][((blockers & ROOK_ATTACK_MASKS[pos]) * ROOK_MAGICS[pos])
-		    >> (64-rook_rellevant_bits[pos])]) | 
+		    >> (ROOK_ATTACK_SHIFTS[pos])]) | 
             (bishopattacks[pos][((blockers & BISHOP_ATTACK_MASKS[pos]) * BISHOP_MAGICS[pos])
 		    >> (BISHOP_ATTACK_SHIFTS[pos])]);
     }
-    std::vector<Objects::Board> GetMovesFromPostion(Objects::Board currposition, Side sidetomove) {
-        unsigned long long position = currposition.GetPeices();
-        unsigned long long playersposition = currposition.GetSideToPlayPeices(sidetomove);
-        unsigned long long oppositionsposition = currposition.GetOppositionsPeices(sidetomove);
-        unsigned long long queenposition = currposition.GetSideToPlayQueens(sidetomove);
-        return std::vector<Objects::Board>();
+    std::vector<Objects::PositionInfo> GetMovesFromPostion(Objects::PositionInfo currposition, int sidetomove) {
+        std::vector<Objects::PositionInfo> childpositions = std::vector<Objects::PositionInfo>();
+        unsigned long long position = currposition.currentboard.GetPieces();
+        unsigned long long playerposition =  currposition.currentboard.GetSideToPlayPieces(sidetomove);
+        unsigned long long oppositionposition = currposition.currentboard.GetOppositionsPieces(sidetomove);
+        unsigned long long oppositionkingposition = currposition.currentboard.GetOppositionsKings(sidetomove);
+        for (int i = 0; i < 6; i++) {
+            unsigned long long currentpieceposition = 0;
+            switch (i) {
+            case 0:
+                currentpieceposition = currposition.currentboard.GetSideToPlayPawns(sidetomove);
+                break;
+            case 1:
+                currentpieceposition = currposition.currentboard.GetSideToPlayKnights(sidetomove);
+                break;
+            case 2:
+                currentpieceposition = currposition.currentboard.GetSideToPlayBishops(sidetomove);
+                break;
+            case 3:
+                currentpieceposition = currposition.currentboard.GetSideToPlayRooks(sidetomove);
+                break;
+            case 4:
+                currentpieceposition = currposition.currentboard.GetSideToPlayQueens(sidetomove);
+                break;
+            case 5:
+                currentpieceposition = currposition.currentboard.GetSideToPlayKings(sidetomove);
+                break;
+            }
+            unsigned long long playerpieceposition = playerposition & currentpieceposition;
+            int playerpiecepos = 63 - (int)_lzcnt_u64(playerpieceposition);
+            while (playerpiecepos != -1) {
+                bool isenpassant = false;
+                unsigned long long currentattacks;
+                switch (i) {
+                case 0:
+                    currentattacks = PawnAttackGen(playerpiecepos, sidetomove);
+                    isenpassant = currentattacks & currposition.currentboard.enpassantpos > 0 ? true : false;
+                    currentattacks = currentattacks & currposition.currentboard.enpassantpos + currentattacks & oppositionposition;
+                    currentattacks |= PawnMoveGen(playerpiecepos, sidetomove, position);
+                    break;
+                case 1:
+                    currentattacks = KnightMoveGen(playerpiecepos);
+                    break;
+                case 2:
+                    currentattacks = BishopMoveGen(playerpiecepos, position);
+                    break;
+                case 3:
+                    currentattacks = RookMoveGen(playerpiecepos, position);
+                    break;
+                case 4:
+                    currentattacks = QueenMoveGen(playerpiecepos, position);
+                    break;
+                case 5:
+                    currentattacks = KingMoveGen(playerpiecepos);
+                    break;
+                }
+                if (currentattacks & oppositionkingposition != 0ull) {
+                    return std::vector<Objects::PositionInfo>();
+                }
+                currentattacks = currentattacks & ~playerposition;
+                int currentmove = 63 - (int)_lzcnt_u64(currentattacks);
+                Objects::PositionInfo temp;
+                while (currentmove != -1) {
+                    std::memcpy(&temp.currentboard, &currposition.currentboard, sizeof(Objects::Board));
+                    std::memcpy(temp.currentboard.pieces, currposition.currentboard.pieces, sizeof(currposition.currentboard.pieces));
+                    std::memcpy(temp.currentboard.colour, currposition.currentboard.colour, sizeof(currposition.currentboard.colour));
+                    temp.currentboard.MovePiece(playerpiecepos, currentmove);
+                    temp.currentboard.UpdateCastlingInfo();
+                    currentattacks ^= 1ull << currentmove;
+                    currentmove = 63 - (int)_lzcnt_u64(currentattacks);
+                    childpositions.push_back(temp);
+                    temp.currentboard.GetFEN;
+                }
+                playerpieceposition ^= 1ull << playerpiecepos;
+                playerpiecepos = 63 - (int)_lzcnt_u64(playerpieceposition);
+            }
+        }
+        return childpositions;
     }
 }

@@ -1,2 +1,5 @@
+cmake_path(GET CMAKE_CURRENT_SOURCE_DIR PARENT_PATH PARENT_DIR)
+cmake_path(GET PARENT_DIR PARENT_PATH PARENTPARENT_DIR)
+include_directories(${PARENTPARENT_DIR}/Display)
 add_library(Board Board.h Board.cpp)
 add_library(PositionInfo PositionInfo.h PositionInfo.cpp)

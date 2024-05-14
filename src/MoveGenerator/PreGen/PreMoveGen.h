@@ -15,6 +15,7 @@ namespace MoveGenerator {
         void Init();
         inline void split(std::string str);
         std::map<int, unsigned long long> GetKnightMoves();
+        std::map<int, unsigned long long> GetKingMoves();
     }
 }
 #endif
