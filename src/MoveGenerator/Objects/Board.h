@@ -132,7 +132,7 @@ namespace MoveGenerator {
                                 (72057594037927936ull & rooks & blackpieces) >> 54 +
                                 (9223372036854775808ull & rooks & blackpieces) >> 59;
             }
-            inline void MovePiece(int startpos, int endpos) {
+            inline void MovePiece(int startpos, int endpos, bool couldbeenpassant = false) {
                 int startpiece = pieces[startpos];
                 int endpiece = pieces[endpos];
                 int startcolour = colour[startpos];
@@ -141,6 +141,21 @@ namespace MoveGenerator {
                 pieces[endpos] = startpiece;
                 colour[startpos] = 2;
                 colour[endpos] = startcolour;
+                if (couldbeenpassant) {
+                    int checkpos = startpos > endpos ? endpos + 8 : endpos - 8;
+                    if (checkpos != startpos) {
+                        if ((colour[checkpos] == 1 && colour[startpos] == 0) || (colour[checkpos] == 0 && colour[startpos] == 1 )) {
+                            if (pieces[checkpos] == 0) {
+                                pieces[checkpos] = nopiece;
+                                colour[checkpos] = nocolour;
+                                unsigned long long mask = ~(1ull << checkpos);
+                                blackpieces &= mask;
+                                whitepieces &= mask;
+                                pawns &= mask;
+                            }
+                        }
+                    }
+                }
                 int startmask = 1 << startpos;
                 int endmask = 1 << endpos;
                 switch (startpiece) {
