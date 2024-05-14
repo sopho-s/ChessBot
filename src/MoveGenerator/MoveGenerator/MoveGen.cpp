@@ -471,7 +471,7 @@ namespace MoveGenerator {
                     currentattacks ^= 1ull << currentmove;
                     currentmove = 63 - (int)_lzcnt_u64(currentattacks);
                     childpositions.push_back(temp);
-                    temp.currentboard.GetFEN;
+                    temp.currentboard.GetFEN();
                 }
                 playerpieceposition ^= 1ull << playerpiecepos;
                 playerpiecepos = 63 - (int)_lzcnt_u64(playerpieceposition);
