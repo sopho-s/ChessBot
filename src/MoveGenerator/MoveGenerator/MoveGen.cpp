@@ -464,9 +464,8 @@ namespace MoveGenerator {
                 int currentmove = (int)_tzcnt_u64(currentattacks);
                 Objects::PositionInfo temp;
                 while (currentmove != 64) {
-                    std::memcpy(&temp.currentboard, &currposition.currentboard, sizeof(Objects::Board));
-                    std::memcpy(temp.currentboard.pieces, currposition.currentboard.pieces, sizeof(currposition.currentboard.pieces));
-                    std::memcpy(temp.currentboard.colour, currposition.currentboard.colour, sizeof(currposition.currentboard.colour));
+                    Objects::PositionInfo temp;
+                    temp.currentboard = currposition.currentboard;
                     temp.currentboard.MovePiece(playerpiecepos, currentmove);
                     childpositions.push_back(temp);
                     temp.currentboard.UpdateCastlingInfo();

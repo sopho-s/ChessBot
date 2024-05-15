@@ -3,6 +3,7 @@
 #include "Display.h"
 #include <iostream>
 #include <algorithm>
+#include <iterator>
 namespace MoveGenerator {
     namespace Objects {
         enum Side : int {
@@ -13,13 +14,11 @@ namespace MoveGenerator {
         };
         struct Board {
             int pieces[64];
-            int parentpos[64];
             int colour[64];
             int startpiece = nopiece;
             int endpiece = nopiece;
             int startposition = -1;
             int endposition = -1;
-            unsigned long long movestate = 0ull;
             unsigned long long blackpieces = 0ull;
             unsigned long long whitepieces = 0ull;
             unsigned long long pawns = 0ull;
@@ -30,11 +29,28 @@ namespace MoveGenerator {
             unsigned long long kings = 0ull;
             unsigned long long enpassantpos = 0ull;
             unsigned long long castlinginfo = 0b11111100;
+            Board() {;}
+            Board(const Board& oldboard) : blackpieces(oldboard.blackpieces), whitepieces(oldboard.whitepieces), pawns(oldboard.pawns), knights(oldboard.knights), bishops(oldboard.bishops), rooks(oldboard.rooks), queens(oldboard.queens), kings(oldboard.kings), enpassantpos(oldboard.enpassantpos), castlinginfo(oldboard.castlinginfo) {
+                std::copy(std::begin(oldboard.pieces), std::end(oldboard.pieces), std::begin(pieces));
+                std::copy(std::begin(oldboard.colour), std::end(oldboard.colour), std::begin(colour));
+            };
+            Board& operator=(const Board& oldboard) {
+                blackpieces = oldboard.blackpieces;
+                whitepieces = oldboard.whitepieces;
+                pawns = oldboard.pawns;
+                knights = oldboard.knights;
+                bishops = oldboard.bishops;
+                rooks = oldboard.rooks;
+                queens = oldboard.queens;
+                kings = oldboard.kings;
+                enpassantpos = 0ull;
+                castlinginfo = oldboard.castlinginfo;
+                std::copy(std::begin(oldboard.pieces), std::end(oldboard.pieces), std::begin(pieces));
+                std::copy(std::begin(oldboard.colour), std::end(oldboard.colour), std::begin(colour));
+                return *this;
+            }
             void GetMove() {
                 Display::print_move(startpiece, startposition, endposition, endpiece != nopiece ? true : false);
-            }
-            void PrintParentPos() {
-                Display::print_intboard(parentpos);
             }
             void GetFEN() {
                 std::string piecenot = "pnbrqk";

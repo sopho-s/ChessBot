@@ -6,16 +6,15 @@ namespace MoveGenerator {
     namespace Objects {
         struct PositionInfo {
             Board currentboard;
-            std::vector<Board> children;
-            unsigned long long blackattacks;
-            unsigned long long whiteattacks;
-            unsigned long long pawnattacks;
-            unsigned long long knightattacks;
-            unsigned long long bishopattacks;
-            unsigned long long rookattacks;
-            unsigned long long queenattacks;
-            unsigned long long kingattacks;
-            unsigned long long pawnmoves;
+            unsigned long long blackattacks = 0ull;
+            unsigned long long whiteattacks = 0ull;
+            unsigned long long pawnattacks = 0ull;
+            unsigned long long knightattacks = 0ull;
+            unsigned long long bishopattacks = 0ull;
+            unsigned long long rookattacks = 0ull;
+            unsigned long long queenattacks = 0ull;
+            unsigned long long kingattacks = 0ull;
+            unsigned long long pawnmoves = 0ull;
             unsigned long long safewhitelong = 0b1110;
             unsigned long long safewhiteshort = 0b1100000;
             unsigned long long safeblacklong = 0b111000000000000000000000000000000000000000000000000000000000;
