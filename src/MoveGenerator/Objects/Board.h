@@ -13,17 +13,29 @@ namespace MoveGenerator {
         };
         struct Board {
             int pieces[64];
+            int parentpos[64];
             int colour[64];
-            unsigned long long blackpieces = 0;
-            unsigned long long whitepieces = 0;
-            unsigned long long pawns = 0;
-            unsigned long long knights = 0;
-            unsigned long long bishops = 0;
-            unsigned long long rooks = 0;
-            unsigned long long queens = 0;
-            unsigned long long kings = 0;
-            unsigned long long enpassantpos = 0;
+            int startpiece = nopiece;
+            int endpiece = nopiece;
+            int startposition = -1;
+            int endposition = -1;
+            unsigned long long movestate = 0ull;
+            unsigned long long blackpieces = 0ull;
+            unsigned long long whitepieces = 0ull;
+            unsigned long long pawns = 0ull;
+            unsigned long long knights = 0ull;
+            unsigned long long bishops = 0ull;
+            unsigned long long rooks = 0ull;
+            unsigned long long queens = 0ull;
+            unsigned long long kings = 0ull;
+            unsigned long long enpassantpos = 0ull;
             unsigned long long castlinginfo = 0b11111100;
+            void GetMove() {
+                Display::print_move(startpiece, startposition, endposition, endpiece != nopiece ? true : false);
+            }
+            void PrintParentPos() {
+                Display::print_intboard(parentpos);
+            }
             void GetFEN() {
                 std::string piecenot = "pnbrqk";
                 std::string fen = "";
@@ -133,8 +145,10 @@ namespace MoveGenerator {
                                 (9223372036854775808ull & rooks & blackpieces) >> 59;
             }
             inline void MovePiece(int startpos, int endpos, bool couldbeenpassant = false) {
-                int startpiece = pieces[startpos];
-                int endpiece = pieces[endpos];
+                startposition = startpos;
+                endposition = endpos;
+                startpiece = pieces[startpos];
+                endpiece = pieces[endpos];
                 int startcolour = colour[startpos];
                 int endcolour = colour[endpos];
                 pieces[startpos] = nopiece;
@@ -156,30 +170,30 @@ namespace MoveGenerator {
                         }
                     }
                 }
-                int startmask = 1 << startpos;
-                int endmask = 1 << endpos;
+                unsigned long long startmask = 1ull << startpos;
+                unsigned long long endmask = 1ull << endpos;
                 switch (startpiece) {
-                case 0:
+                case pawn:
                     pawns |= endmask;
                     pawns ^= startmask;
                     break;
-                case 1:
+                case knight:
                     knights |= endmask;
                     knights ^= startmask;
                     break;
-                case 2:
+                case bishop:
                     bishops |= endmask;
                     bishops ^= startmask;
                     break;
-                case 3:
+                case rook:
                     rooks |= endmask;
                     rooks ^= startmask;
                     break;
-                case 4:
+                case queen:
                     queens |= endmask;
                     queens ^= startmask;
                     break;
-                case 5:
+                case king:
                     kings |= endmask;
                     kings ^= startmask;
                     break;
@@ -192,22 +206,22 @@ namespace MoveGenerator {
                     blackpieces ^= startmask;
                 }
                 switch (endpiece) {
-                case 1:
+                case pawn:
                     pawns |= endmask;
                     break;
-                case 2:
+                case knight:
                     knights |= endmask;
                     break;
-                case 3:
+                case bishop:
                     bishops |= endmask;
                     break;
-                case 4:
+                case rook:
                     rooks |= endmask;
                     break;
-                case 5:
+                case queen:
                     queens |= endmask;
                     break;
-                case 6:
+                case king:
                     kings |= endmask;
                     break;
                 }

@@ -16,10 +16,10 @@ namespace MoveGenerator {
             unsigned long long queenattacks;
             unsigned long long kingattacks;
             unsigned long long pawnmoves;
-            const long long safewhitelong = 0b1110;
-            const long long safewhiteshort = 0b1100000;
-            const long long safeblacklong = 0b111000000000000000000000000000000000000000000000000000000000;
-            const long long safeblackshort = 0b110000000000000000000000000000000000000000000000000000000000000;
+            unsigned long long safewhitelong = 0b1110;
+            unsigned long long safewhiteshort = 0b1100000;
+            unsigned long long safeblacklong = 0b111000000000000000000000000000000000000000000000000000000000;
+            unsigned long long safeblackshort = 0b110000000000000000000000000000000000000000000000000000000000000;
         };
     }
 }

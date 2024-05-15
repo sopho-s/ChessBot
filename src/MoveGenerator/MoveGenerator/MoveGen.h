@@ -49,12 +49,13 @@ namespace MoveGenerator {
     void InitBishopTable();
     void InitKnightTable();
     void InitKingTable();
-    unsigned long long PawnAttackGen(int pos, int sidetomove);
-    unsigned long long KingMoveGen(int pos);
-    unsigned long long KnightMoveGen(int pos);
-    unsigned long long RookMoveGen(int pos, unsigned long long blockers);
-    unsigned long long BishopMoveGen(int pos, unsigned long long blockers);
-    unsigned long long QueenMoveGen(int pos, unsigned long long blockers);
-    std::vector<Objects::PositionInfo> GetMovesFromPostion(Objects::PositionInfo currposition, int sidetomove);
+    inline unsigned long long PawnAttackGen(int &pos, int &sidetomove);
+    inline unsigned long long PawnMoveGen(int &pos, int &sidetomove, unsigned long long pieces);
+    inline unsigned long long KingMoveGen(int &pos);
+    inline unsigned long long KnightMoveGen(int &pos);
+    inline unsigned long long RookMoveGen(int &pos, unsigned long long &blockers);
+    inline unsigned long long BishopMoveGen(int &pos, unsigned long long &blockers);
+    inline unsigned long long QueenMoveGen(int &pos, unsigned long long &blockers);
+    std::vector<Objects::PositionInfo> GetMovesFromPostion(Objects::PositionInfo &currposition, int sidetomove, bool print = false);
 }
 #endif

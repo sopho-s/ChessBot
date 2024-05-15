@@ -2,6 +2,9 @@
 #define get_bit(bitboard, square) (bitboard & (1ULL << square))
 namespace Display {
     const std::string PIECE_STR = "PNBRQK~>pnbrqk.";
+    const std::string MOVE_STR = " nbrqk,";
+    const std::string FILE_STR = "abcdefgh";
+    const std::string RANK_STR = "12345678";
     std::ostream& operator<< (std::ostream& os, const int*& p) {
         const char* s = "   +---+---+---+---+---+---+---+---+\n";
         const char* t = "     A   B   C   D   E   F   G   H\n";
@@ -28,15 +31,20 @@ namespace Display {
                 int square = rank * 8 + file;
                 
                 if (!file)
-                    printf("  %d ", 8 - rank);
+                    printf("  %d ", 1 + rank);
                 
-                printf(" %d", intboard[square]);
+                if (intboard[square] != 6) {
+                    printf(" %d", intboard[square]);
+                } else {
+                    printf(" .");
+                }
             }
             
             printf("\n");
         }
         
         printf("\n     a b c d e f g h\n\n");
+
     }
     void print_bitboard(unsigned long long bitboard)
     {
@@ -50,7 +58,6 @@ namespace Display {
                 
                 if (!file)
                     printf("  %d ", 8 - rank);
-                
                 printf(" %d", get_bit(bitboard, square) ? 1 : 0);
             }
             
@@ -60,5 +67,20 @@ namespace Display {
         printf("\n     a b c d e f g h\n\n");
         
         printf("     bitboard: %llu\n\n", bitboard);
+    }
+    void print_move(int startpiece, int startpos, int endpos, bool istake, bool isshortcastle, bool islongcastle) {
+        if (startpos == -1) {
+            std::cout << "root" << std::endl;
+        }
+        std::string output = "";
+        output += FILE_STR[startpos % 8];
+        output += RANK_STR[(int)((startpos - startpos % 8) / 8)];
+        if (istake) {
+            output += "x";
+        }
+        output += MOVE_STR[startpiece];
+        output += FILE_STR[endpos % 8];
+        output += RANK_STR[(int)((endpos - endpos % 8) / 8)];
+        std::cout << output << std::endl;
     }
 }

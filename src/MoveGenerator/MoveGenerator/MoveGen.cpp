@@ -5,8 +5,8 @@ namespace {
 namespace MoveGenerator {
     unsigned long long rookmoves[64];
     unsigned long long bishopmoves[64];
-    std::map<int, unsigned long long> kingmoves;
-    std::map<int, unsigned long long> knightmoves;
+    unsigned long long kingmoves[64];
+    unsigned long long knightmoves[64];
 
     const unsigned long long ROOK_MAGICS[64] = {
         0x8a80104000800020ULL,
@@ -332,13 +332,12 @@ namespace MoveGenerator {
         std::ifstream File("kingmoves.csv");
         std::string kingmovestxt;
         getline(File, kingmovestxt);
-        std::map<int, unsigned long long> kingmap;
         split(kingmovestxt);
         for (int i = 0; i < 64; i++) {
             kingmoves[i] = std::stoull(strings[i]);
         }
     }
-    unsigned long long PawnAttackGen(int pos, int sidetomove) {
+    inline unsigned long long PawnAttackGen(int &pos, int &sidetomove) {
         unsigned long long piecepos = 1ull << pos;
         unsigned long long attacks = 0ull;
         if (sidetomove == 0) {
@@ -350,7 +349,7 @@ namespace MoveGenerator {
         }
         return attacks;
     }
-    unsigned long long PawnMoveGen(int pos, int sidetomove, unsigned long long pieces) {
+    inline unsigned long long PawnMoveGen(int &pos, int &sidetomove, unsigned long long pieces) {
         unsigned long long piecepos = 1ull << pos;
         unsigned long long attacks = 0ull;
         if (sidetomove == 0) {
@@ -380,27 +379,27 @@ namespace MoveGenerator {
         }
         return attacks;
     }
-    unsigned long long KingMoveGen(int pos) {
+    inline unsigned long long KingMoveGen(int &pos) {
         return kingmoves[pos];
     }
-    unsigned long long KnightMoveGen(int pos) {
+    inline unsigned long long KnightMoveGen(int &pos) {
         return knightmoves[pos];
     }
-    unsigned long long RookMoveGen(int pos, unsigned long long blockers) {
+    inline unsigned long long RookMoveGen(int &pos, unsigned long long &blockers) {
         return rookattacks[pos][((blockers & ROOK_ATTACK_MASKS[pos]) * ROOK_MAGICS[pos])
 		    >> (ROOK_ATTACK_SHIFTS[pos])];
     }
-    unsigned long long BishopMoveGen(int pos, unsigned long long blockers) {
+    inline unsigned long long BishopMoveGen(int &pos, unsigned long long &blockers) {
         return bishopattacks[pos][((blockers & BISHOP_ATTACK_MASKS[pos]) * BISHOP_MAGICS[pos])
 		    >> (BISHOP_ATTACK_SHIFTS[pos])];
     }
-    unsigned long long QueenMoveGen(int pos, unsigned long long blockers) {
+    inline unsigned long long QueenMoveGen(int &pos, unsigned long long &blockers) {
         return (rookattacks[pos][((blockers & ROOK_ATTACK_MASKS[pos]) * ROOK_MAGICS[pos])
 		    >> (ROOK_ATTACK_SHIFTS[pos])]) | 
             (bishopattacks[pos][((blockers & BISHOP_ATTACK_MASKS[pos]) * BISHOP_MAGICS[pos])
 		    >> (BISHOP_ATTACK_SHIFTS[pos])]);
     }
-    std::vector<Objects::PositionInfo> GetMovesFromPostion(Objects::PositionInfo currposition, int sidetomove) {
+    std::vector<Objects::PositionInfo> GetMovesFromPostion(Objects::PositionInfo &currposition, int sidetomove, bool print) {
         std::vector<Objects::PositionInfo> childpositions = std::vector<Objects::PositionInfo>();
         unsigned long long position = currposition.currentboard.GetPieces();
         unsigned long long playerposition =  currposition.currentboard.GetSideToPlayPieces(sidetomove);
@@ -429,10 +428,11 @@ namespace MoveGenerator {
                 break;
             }
             unsigned long long playerpieceposition = playerposition & currentpieceposition;
-            int playerpiecepos = 63 - (int)_lzcnt_u64(playerpieceposition);
-            while (playerpiecepos != -1) {
+            int playerpiecepos = (int)_tzcnt_u64(playerpieceposition);
+            while (playerpiecepos != 64) {
                 bool isenpassant = false;
                 unsigned long long currentattacks;
+                unsigned long long tempstore = 0ull;
                 switch (i) {
                 case 0:
                     currentattacks = PawnAttackGen(playerpiecepos, sidetomove);
@@ -460,21 +460,21 @@ namespace MoveGenerator {
                     return std::vector<Objects::PositionInfo>();
                 }
                 currentattacks = currentattacks & ~playerposition;
-                int currentmove = 63 - (int)_lzcnt_u64(currentattacks);
+                tempstore = currentattacks;
+                int currentmove = (int)_tzcnt_u64(currentattacks);
                 Objects::PositionInfo temp;
-                while (currentmove != -1) {
+                while (currentmove != 64) {
                     std::memcpy(&temp.currentboard, &currposition.currentboard, sizeof(Objects::Board));
                     std::memcpy(temp.currentboard.pieces, currposition.currentboard.pieces, sizeof(currposition.currentboard.pieces));
                     std::memcpy(temp.currentboard.colour, currposition.currentboard.colour, sizeof(currposition.currentboard.colour));
                     temp.currentboard.MovePiece(playerpiecepos, currentmove);
+                    childpositions.push_back(temp);
                     temp.currentboard.UpdateCastlingInfo();
                     currentattacks ^= 1ull << currentmove;
-                    currentmove = 63 - (int)_lzcnt_u64(currentattacks);
-                    childpositions.push_back(temp);
-                    temp.currentboard.GetFEN();
+                    currentmove = (int)_tzcnt_u64(currentattacks);
                 }
                 playerpieceposition ^= 1ull << playerpiecepos;
-                playerpiecepos = 63 - (int)_lzcnt_u64(playerpieceposition);
+                playerpiecepos = (int)_tzcnt_u64(playerpieceposition);
             }
         }
         return childpositions;
