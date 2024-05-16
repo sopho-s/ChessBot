@@ -260,7 +260,7 @@ namespace MoveGenerator {
                 } else if (endcolour == 1) {
                     blackpieces ^= endmask;
                 }
-                SetHashKey();
+                //SetHashKey();
             }
         };
     }
