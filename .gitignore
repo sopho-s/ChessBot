@@ -3,4 +3,4 @@ build/
 .idea/
 *.csv
 *.bat
-*.txt
+*ply*
