@@ -4,6 +4,8 @@
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+//#include <string>
+#include "Hash.h"
 namespace MoveGenerator {
     namespace Objects {
         enum Side : int {
@@ -19,6 +21,7 @@ namespace MoveGenerator {
             int endpiece = nopiece;
             int startposition = -1;
             int endposition = -1;
+            unsigned int zorbisthash = 0;
             unsigned long long blackpieces = 0ull;
             unsigned long long whitepieces = 0ull;
             unsigned long long pawns = 0ull;
@@ -49,10 +52,16 @@ namespace MoveGenerator {
                 std::copy(std::begin(oldboard.colour), std::end(oldboard.colour), std::begin(colour));
                 return *this;
             }
+            inline unsigned int GetHashKey() {
+                return Utilities::Hash::ZorbistHash(pieces, colour);
+            }
+            inline void SetHashKey() {
+                zorbisthash = Utilities::Hash::AddPosition(pieces, colour);
+            }
             void GetMove() {
                 Display::print_move(startpiece, startposition, endposition, endpiece != nopiece ? true : false);
             }
-            void GetFEN() {
+            std::string GetFEN() {
                 std::string piecenot = "pnbrqk";
                 std::string fen = "";
                 int count = 0;
@@ -64,7 +73,7 @@ namespace MoveGenerator {
                         fen = fen + "/";
                         count = 0;
                     }
-                    if (pieces[i] == nopiece) {
+                    if (pieces[i] != pawn && pieces[i] != knight && pieces[i] != bishop && pieces[i] != rook && pieces[i] != queen && pieces[i] != king) {
                         count++;
                     } else {
                         if (count > 0){
@@ -73,18 +82,23 @@ namespace MoveGenerator {
                         }
                         fen += colour[i] == 0 ? std::toupper(piecenot[pieces[i]]) : piecenot[pieces[i]];
                     }
-                }std::reverse(fen.begin(), fen.end());
-                std::cout << "FEN: " << fen << std::endl;
+                }
+                if (count > 0){
+                    fen += std::to_string(count);
+                    count = 0;
+                }
+                std::reverse(fen.begin(), fen.end());
+                return fen;
             }
             void DefaultPosition() {
-                int firstrow[8] = {rook, knight, bishop, queen, king, bishop, knight, rook};
+                int firstrow[8] = {rook, knight, bishop, king, queen, bishop, knight, rook};
                 int secondrow[8] = {pawn, pawn, pawn, pawn, pawn, pawn, pawn, pawn};
                 int thirdrow[8] = {nopiece, nopiece, nopiece, nopiece, nopiece, nopiece, nopiece, nopiece};
                 int fourthrow[8] = {nopiece, nopiece, nopiece, nopiece, nopiece, nopiece, nopiece, nopiece};
                 int fithrow[8] = {nopiece, nopiece, nopiece, nopiece, nopiece, nopiece, nopiece, nopiece};
                 int sixthrow[8] = {nopiece, nopiece, nopiece, nopiece, nopiece, nopiece, nopiece, nopiece};
                 int seventhrow[8] = {pawn, pawn, pawn, pawn, pawn, pawn, pawn, pawn};
-                int eighthrow[8] = {rook, knight, bishop, queen, king, bishop, knight, rook};
+                int eighthrow[8] = {rook, knight, bishop, king, queen, bishop, knight, rook};
                 for (int i = 0; i < 8; i++) {
                     pieces[i] = firstrow[i];
                     pieces[i + 8] = secondrow[i];
@@ -246,6 +260,7 @@ namespace MoveGenerator {
                 } else if (endcolour == 1) {
                     blackpieces ^= endmask;
                 }
+                SetHashKey();
             }
         };
     }

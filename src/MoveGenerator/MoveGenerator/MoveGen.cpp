@@ -341,8 +341,8 @@ namespace MoveGenerator {
         unsigned long long piecepos = 1ull << pos;
         unsigned long long attacks = 0ull;
         if (sidetomove == 0) {
-            attacks = piecepos << 9 & 0b111111101111111011111110111111101111111011111110111111101111111;
-            attacks |= piecepos << 7 & 0b1111111011111110111111101111111011111110111111101111111011111110;
+            attacks = piecepos << 9 & 0b1111111011111110111111101111111011111110111111101111111011111110;
+            attacks |= piecepos << 7 & 0b111111101111111011111110111111101111111011111110111111101111111;
         } else {
             attacks = piecepos >> 9 & 0b111111101111111011111110111111101111111011111110111111101111111;
             attacks |= piecepos >> 7 & 0b1111111011111110111111101111111011111110111111101111111011111110;
@@ -353,27 +353,23 @@ namespace MoveGenerator {
         unsigned long long piecepos = 1ull << pos;
         unsigned long long attacks = 0ull;
         if (sidetomove == 0) {
-            pieces = pieces << 8;
             attacks = piecepos << 8;
-            if (attacks & pieces > 0ull) {
+            if (!((int)_tzcnt_u64(attacks & pieces) == 64)) {
                 attacks = 0ull;
                 return attacks;
             }
-            pieces = pieces << 8;
             attacks |= (piecepos & 65280ull) << 16;
-            if (attacks & pieces > 0ull) {
+            if (!((int)_tzcnt_u64(attacks & pieces) == 64)) {
                 attacks -= attacks & pieces;
             }
         } else {
-            pieces = pieces >> 8;
             attacks = piecepos >> 8;
-            if (attacks & pieces > 0ull) {
+            if (!((int)_tzcnt_u64(attacks & pieces) == 64)) {
                 attacks = 0ull;
                 return attacks;
             }
-            pieces = pieces >> 8;
             attacks |= (piecepos & 71776119061217280ull) >> 16;
-            if (attacks & pieces > 0ull) {
+            if (!((int)_tzcnt_u64(attacks & pieces) == 64)) {
                 attacks -= attacks & pieces;
             }
         }
@@ -456,7 +452,7 @@ namespace MoveGenerator {
                     currentattacks = KingMoveGen(playerpiecepos);
                     break;
                 }
-                if (currentattacks & oppositionkingposition != 0ull) {
+                if (!((int)_tzcnt_u64(currentattacks & oppositionkingposition) == 64)) {
                     return std::vector<Objects::PositionInfo>();
                 }
                 currentattacks = currentattacks & ~playerposition;

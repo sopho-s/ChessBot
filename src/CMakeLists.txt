@@ -6,17 +6,20 @@ set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD /O2")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
 
-include_directories(MoveGenerator/Objects MoveGenerator/PreGen MoveGenerator/MoveGenerator Display)
+include_directories(MoveGenerator/Objects MoveGenerator/PreGen MoveGenerator/MoveGenerator Display Utilities/Hash)
 
-add_executable(ChessBot main)
+add_executable(ChessBot main.cpp)
+
+add_subdirectory(Utilities)
 
 add_subdirectory(Display)
 
 add_subdirectory(MoveGenerator)
 
 target_link_libraries(ChessBot PRIVATE
-    PreMoveGen
     MoveGen
+    PreMoveGen
     Display
     Board
-    PositionInfo)
+    PositionInfo
+    Hash)

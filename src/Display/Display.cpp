@@ -2,7 +2,7 @@
 #define get_bit(bitboard, square) (bitboard & (1ULL << square))
 namespace Display {
     const std::string PIECE_STR = "PNBRQK~>pnbrqk.";
-    const std::string MOVE_STR = " nbrqk,";
+    const std::string MOVE_STR = " NBRQK,";
     const std::string FILE_STR = "abcdefgh";
     const std::string RANK_STR = "12345678";
     std::ostream& operator<< (std::ostream& os, const int*& p) {
