@@ -395,8 +395,9 @@ namespace MoveGenerator {
             (bishopattacks[pos][((blockers & BISHOP_ATTACK_MASKS[pos]) * BISHOP_MAGICS[pos])
 		    >> (BISHOP_ATTACK_SHIFTS[pos])]);
     }
-    std::vector<Objects::PositionInfo> GetMovesFromPostion(Objects::PositionInfo &currposition, int sidetomove, bool print) {
-        std::vector<Objects::PositionInfo> childpositions = std::vector<Objects::PositionInfo>();
+    void GetMovesFromPostion(Objects::PositionInfo &currposition, int sidetomove, std::vector<Objects::PositionInfo> &returnmoves, bool print) {
+        std::vector<Objects::PositionInfo>::iterator tempend = returnmoves.end();
+        int count = 0;
         unsigned long long position = currposition.currentboard.GetPieces();
         unsigned long long playerposition =  currposition.currentboard.GetSideToPlayPieces(sidetomove);
         unsigned long long oppositionposition = currposition.currentboard.GetOppositionsPieces(sidetomove);
@@ -453,7 +454,8 @@ namespace MoveGenerator {
                     break;
                 }
                 if (!((int)_tzcnt_u64(currentattacks & oppositionkingposition) == 64)) {
-                    return std::vector<Objects::PositionInfo>();
+                    returnmoves.erase(tempend, tempend + count);
+                    return;
                 }
                 currentattacks = currentattacks & ~playerposition;
                 tempstore = currentattacks;
@@ -463,7 +465,8 @@ namespace MoveGenerator {
                     Objects::PositionInfo temp;
                     temp.currentboard = currposition.currentboard;
                     temp.currentboard.MovePiece(playerpiecepos, currentmove);
-                    childpositions.push_back(temp);
+                    returnmoves.push_back(temp);
+                    count++;
                     temp.currentboard.UpdateCastlingInfo();
                     currentattacks ^= 1ull << currentmove;
                     currentmove = (int)_tzcnt_u64(currentattacks);
@@ -472,6 +475,5 @@ namespace MoveGenerator {
                 playerpiecepos = (int)_tzcnt_u64(playerpieceposition);
             }
         }
-        return childpositions;
     }
 }

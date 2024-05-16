@@ -1,6 +1,9 @@
 build/
 .vscode/
+.vs/
 .idea/
+Profiles/
+out/
 *.csv
 *.bat
 *ply*

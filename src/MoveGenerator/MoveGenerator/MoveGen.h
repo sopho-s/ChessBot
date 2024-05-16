@@ -56,6 +56,6 @@ namespace MoveGenerator {
     inline unsigned long long RookMoveGen(int &pos, unsigned long long &blockers);
     inline unsigned long long BishopMoveGen(int &pos, unsigned long long &blockers);
     inline unsigned long long QueenMoveGen(int &pos, unsigned long long &blockers);
-    std::vector<Objects::PositionInfo> GetMovesFromPostion(Objects::PositionInfo &currposition, int sidetomove, bool print = false);
+    void GetMovesFromPostion(Objects::PositionInfo &currposition, int sidetomove, std::vector<Objects::PositionInfo> &returnmoves, bool print = false);
 }
 #endif

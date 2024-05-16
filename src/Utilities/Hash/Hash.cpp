@@ -1,7 +1,7 @@
 #include "Hash.h"
 namespace {
-    unsigned long long int ZobristTable[8 * 8][12];
-    const int HashSize = 160000000;
+    unsigned long long int ZobristTable[64 * 12];
+    const int HashSize = 16000000;
     int count = 0;
     bool Taken[HashSize];
     float EvalTable[HashSize];
@@ -19,13 +19,13 @@ namespace Utilities {
             for (int i = 0; i<8; i++)
             for (int j = 0; j<8; j++)
                 for (int k = 0; k<12; k++)
-                ZobristTable[i + j * 8][k] = randomInt();
+                ZobristTable[(i + j * 8) * 12 + k] = randomInt();
         }
         unsigned long long ZorbistHash(int *intboard, int *colours) {
             unsigned long long hash = 0;
             for (int i = 0; i < 64; i++) {
                 if (colours[i] != 2) {
-                    hash ^= ZobristTable[i][colours[i] * 7 + intboard[i]];
+                    hash ^= ZobristTable[i * 12 + colours[i] * 7 + intboard[i]];
                 }
             }
             return hash;
@@ -34,7 +34,7 @@ namespace Utilities {
             unsigned long long hash = 0;
             for (int i = 0; i < 64; i++) {
                 if (colours[i] != 2) {
-                    hash ^= ZobristTable[i][colours[i] * 7 + intboard[i]];
+                    hash ^= ZobristTable[i * 12 + colours[i] * 7 + intboard[i]];
                 }
             }
             hash = hash % HashSize;
