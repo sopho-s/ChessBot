@@ -14,11 +14,11 @@ namespace MoveGenerator {
             unsigned long long rookattacks = 0ull;
             unsigned long long queenattacks = 0ull;
             unsigned long long kingattacks = 0ull;
-            unsigned long long pawnmoves = 0ull;
-            unsigned long long safewhitelong = 0b1110;
-            unsigned long long safewhiteshort = 0b1100000;
-            unsigned long long safeblacklong = 0b111000000000000000000000000000000000000000000000000000000000;
-            unsigned long long safeblackshort = 0b110000000000000000000000000000000000000000000000000000000000000;
+            //unsigned long long pawnmoves = 0ull;
+            //unsigned long long safewhitelong = 0b1110;
+            //unsigned long long safewhiteshort = 0b1100000;
+            //unsigned long long safeblacklong = 0b111000000000000000000000000000000000000000000000000000000000;
+            //unsigned long long safeblackshort = 0b110000000000000000000000000000000000000000000000000000000000000;
         };
     }
 }

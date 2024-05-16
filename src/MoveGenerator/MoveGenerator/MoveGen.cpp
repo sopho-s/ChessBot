@@ -461,7 +461,7 @@ namespace MoveGenerator {
                 tempstore = currentattacks;
                 int currentmove = (int)_tzcnt_u64(currentattacks);
                 while (currentmove != 64) {
-                    std::shared_ptr<Objects::PositionInfo> temp(new Objects::PositionInfo);
+                    std::shared_ptr<Objects::PositionInfo> temp = std::make_shared<Objects::PositionInfo>();
                     (*temp).currentboard = currposition.currentboard;
                     (*temp).currentboard.MovePiece(playerpiecepos, currentmove);
                     count++;
