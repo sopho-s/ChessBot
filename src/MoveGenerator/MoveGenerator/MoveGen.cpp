@@ -395,8 +395,8 @@ namespace MoveGenerator {
             (bishopattacks[pos][((blockers & BISHOP_ATTACK_MASKS[pos]) * BISHOP_MAGICS[pos])
 		    >> (BISHOP_ATTACK_SHIFTS[pos])]);
     }
-    void GetMovesFromPostion(Objects::PositionInfo &currposition, int sidetomove, std::vector<Objects::PositionInfo> &returnmoves, bool print) {
-        std::vector<Objects::PositionInfo>::iterator tempend = returnmoves.end();
+    void GetMovesFromPostion(Objects::PositionInfo &currposition, int sidetomove, std::vector<std::shared_ptr<Objects::PositionInfo>> &returnmoves, bool print) {
+        std::vector<std::shared_ptr<Objects::PositionInfo>>::iterator tempend = returnmoves.end();
         int count = 0;
         unsigned long long position = currposition.currentboard.GetPieces();
         unsigned long long playerposition =  currposition.currentboard.GetSideToPlayPieces(sidetomove);
@@ -460,14 +460,13 @@ namespace MoveGenerator {
                 currentattacks = currentattacks & ~playerposition;
                 tempstore = currentattacks;
                 int currentmove = (int)_tzcnt_u64(currentattacks);
-                Objects::PositionInfo temp;
                 while (currentmove != 64) {
-                    Objects::PositionInfo temp;
-                    temp.currentboard = currposition.currentboard;
-                    temp.currentboard.MovePiece(playerpiecepos, currentmove);
-                    returnmoves.push_back(temp);
+                    std::shared_ptr<Objects::PositionInfo> temp = std::make_shared<Objects::PositionInfo>();
+                    (*temp).currentboard = currposition.currentboard;
+                    (*temp).currentboard.MovePiece(playerpiecepos, currentmove);
                     count++;
-                    temp.currentboard.UpdateCastlingInfo();
+                    (*temp).currentboard.UpdateCastlingInfo();
+                    returnmoves.push_back(temp);
                     currentattacks ^= 1ull << currentmove;
                     currentmove = (int)_tzcnt_u64(currentattacks);
                 }
